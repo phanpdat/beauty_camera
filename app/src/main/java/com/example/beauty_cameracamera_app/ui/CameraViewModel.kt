@@ -14,18 +14,11 @@ class CameraViewModel @Inject constructor(
     private val cameraManager: CameraManager
 ) : ViewModel() {
 
-    private val _intensity = MutableStateFlow(0.8f)
-    val intensity = _intensity.asStateFlow()
+    private val _filterIntensity = MutableStateFlow(0.8f)
+    val filterIntensity = _filterIntensity.asStateFlow()
 
-    private val _beautyLevel = MutableStateFlow(0.5f)
-    val beautyLevel = _beautyLevel.asStateFlow()
-
-    fun updateIntensity(value: Float) {
-        _intensity.value = value
-    }
-
-    fun updateBeautyLevel(value: Float) {
-        _beautyLevel.value = value
+    fun updateFilterIntensity(value: Float) {
+        _filterIntensity.value = value
     }
 
     fun startCamera(lifecycleOwner: LifecycleOwner, surfaceTexture: SurfaceTexture) {

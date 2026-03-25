@@ -14,13 +14,10 @@ class CameraGLView @JvmOverloads constructor(
     fun init(cameraRenderer: CameraRenderer) {
         renderer = cameraRenderer
 
-        // OpenGL ES 2.0
         setEGLContextClientVersion(2)
 
-        // Renderer
         setRenderer(renderer)
 
-        // Chỉ vẽ khi có frame mới (tiết kiệm pin)
         renderMode = RENDERMODE_CONTINUOUSLY
     }
 

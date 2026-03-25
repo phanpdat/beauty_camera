@@ -27,16 +27,14 @@ class CameraManager @Inject constructor(
         cameraProviderFuture.addListener({
             cameraProvider = cameraProviderFuture.get()
 
-            preview = Preview.Builder().build().also {
-                // Kết nối CameraX → SurfaceTexture (OpenGL OES)
-                it.setSurfaceProvider { request ->
-                    val surface = Surface(surfaceTexture)
-                    request.provideSurface(surface, ContextCompat.getMainExecutor(context)) { result ->
-                        // Surface đã được giải phóng
-                        surface.release()
+            preview = Preview.Builder()
+                .setTargetAspectRatio(androidx.camera.core.AspectRatio.RATIO_16_9) 
+                .build().also {
+                    it.setSurfaceProvider { request ->
+                        val surface = Surface(surfaceTexture)
+                        request.provideSurface(surface, ContextCompat.getMainExecutor(context)) { }
                     }
                 }
-            }
 
             try {
                 cameraProvider?.unbindAll()

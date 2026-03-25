@@ -12,6 +12,7 @@ import android.provider.MediaStore
 import android.util.TypedValue
 import android.view.Gravity
 import android.widget.LinearLayout
+import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -24,7 +25,6 @@ import com.example.beauty_cameracamera_app.filter.FilterList
 import androidx.lifecycle.lifecycleScope
 import com.example.beauty_cameracamera_app.gl.CameraRenderer
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
@@ -64,43 +64,27 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
+        // Observe filter intensity
         lifecycleScope.launch {
-            viewModel.intensity.collectLatest { valIntensity ->
-                renderer?.intensity = valIntensity
-            }
-        }
-        lifecycleScope.launch {
-            viewModel.beautyLevel.collectLatest { valBeauty ->
-                renderer?.beautyLevel = valBeauty
+            viewModel.filterIntensity.collect { intensity ->
+                renderer?.intensity = intensity
             }
         }
     }
 
     private fun setupIntensitySeekBar() {
         // Initial setup
-        binding.intensitySeekBar.progress = (viewModel.intensity.value * 100).toInt()
-        binding.beautySeekBar.progress = (viewModel.beautyLevel.value * 100).toInt()
+        binding.intensitySeekBar.progress = (viewModel.filterIntensity.value * 100).toInt()
 
         // Filter Intensity
-        binding.intensitySeekBar.setOnSeekBarChangeListener(object : android.widget.SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: android.widget.SeekBar?, progress: Int, fromUser: Boolean) {
+        binding.intensitySeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    viewModel.updateIntensity(progress / 100f)
+                    viewModel.updateFilterIntensity(progress / 100f)
                 }
             }
-            override fun onStartTrackingTouch(seekBar: android.widget.SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: android.widget.SeekBar?) {}
-        })
-
-        // Beauty Level
-        binding.beautySeekBar.setOnSeekBarChangeListener(object : android.widget.SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: android.widget.SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser) {
-                    viewModel.updateBeautyLevel(progress / 100f)
-                }
-            }
-            override fun onStartTrackingTouch(seekBar: android.widget.SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: android.widget.SeekBar?) {}
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
     }
 
@@ -113,9 +97,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initGLView() {
-        renderer = CameraRenderer(this) { surfaceTexture ->
+        renderer = CameraRenderer(this) { st ->
             runOnUiThread {
-                viewModel.startCamera(this, surfaceTexture)
+                viewModel.startCamera(this, st)
             }
         }
         binding.cameraGLView.init(renderer!!)
@@ -126,7 +110,6 @@ class MainActivity : AppCompatActivity() {
     private fun setupCaptureButton() {
         binding.btnCapture.setOnClickListener {
             renderer?.capture { bitmap ->
-                // Callback chạy trên GL thread → chuyển về Main thread để save
                 runOnUiThread {
                     saveToGallery(bitmap)
                 }
@@ -139,7 +122,6 @@ class MainActivity : AppCompatActivity() {
             val fileName = "BeautyCamera_${System.currentTimeMillis()}.jpg"
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                // Android 10+ dùng MediaStore
                 val contentValues = ContentValues().apply {
                     put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
                     put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
@@ -153,7 +135,6 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             } else {
-                // Android 9 trở xuống
                 val dir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "BeautyCamera")
                 if (!dir.exists()) dir.mkdirs()
 
@@ -170,7 +151,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ========== Filter List ==========
 
     private fun setupFilterList() {
         val container = binding.filterContainer

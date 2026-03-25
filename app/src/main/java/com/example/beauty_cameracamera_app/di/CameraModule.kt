@@ -9,5 +9,4 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object CameraModule {
-    // Sẽ thêm các Provider cho CameraProvider, OpenGL Shader Manager ở đây sau
 }
