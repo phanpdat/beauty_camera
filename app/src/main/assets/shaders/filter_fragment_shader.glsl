@@ -56,31 +56,31 @@ vec2 liquifyWarp(vec2 uv, vec2 center, float radius, float amount) {
 }
 
 void main() {
-    // 0. ZOOM CONTROL (Lùi xa mặt ra)
+    // ZOOM CONTROL (Lùi xa mặt ra)
     vec2 uv = (vTexCoord - 0.5) * uScale + 0.5;
 
-    // 0.1 NÂNG MŨI THON GỌN (AI RESHAPE) 
+    // NÂNG MŨI THON GỌN (AI RESHAPE) 
     if (abs(uNoseSlimming) > 0.001) {
         uv = liquifyWarp(uv, uNoseCenter, 0.15, uNoseSlimming);
     }
 
-    // 0.2 GỌT CẰM V-LINE 🦴✨
+    // GỌT CẰM V-LINE 
     if (abs(uChinSlimming) > 0.001) {
         uv = liquifyWarp(uv, uChinCenter, 0.20, uChinSlimming);
     }
 
-    // 0.3 MẮT TO TRÒN 👀✨ (Sử dụng số âm vì amount < 0 là phình to)
+    // MẮT TO TRÒN (Sử dụng số âm vì amount < 0 là phình to)
     if (abs(uEyeSize) > 0.001) {
         uv = liquifyWarp(uv, uLeftEye, 0.10, -uEyeSize);
         uv = liquifyWarp(uv, uRightEye, 0.10, -uEyeSize);
     }
 
-    // 0.4 MÔI MỌNG 👄✨
+    // MÔI MỌNG 
     if (abs(uLipSize) > 0.001) {
         uv = liquifyWarp(uv, uLipCenter, 0.12, uLipSize);
     }
 
-    // 1. SIÊU LÀM NÉT (Ultra-Sharpen Algorithm) - Cải thiện độ trong trẻo 100%
+    // SIÊU LÀM NÉT (Ultra-Sharpen Algorithm) - Cải thiện độ trong trẻo 100%
     float offset = 1.0 / 1024.0; // Sử dụng lưới lấy mẫu siêu mịn
     vec3 baseColor = texture2D(uTexture, uv).rgb;
     
@@ -92,17 +92,17 @@ void main() {
     
     // Thuật toán: Làm nổi bật sự khác biệt của trung tâm so với vùng lân cận
     vec3 sharpColor = baseColor * 5.0 - (left + right + top + bottom);
-    vec3 result = mix(baseColor, sharpColor, 0.65); // Tăng mức độ nét gấp đôi!
+    vec3 result = mix(baseColor, sharpColor, 0.65); 
     
     vec3 original = result;
 
-    // 2. BRIGHTNESS & CONTRAST
+    // BRIGHTNESS & CONTRAST
     result = (result - 0.5) * uContrast + 0.5 + uBrightness;
 
-    // 3. VIBRANCE (Bảo vệ màu da)
+    // VIBRANCE (Bảo vệ màu da)
     result = applyVibrance(result, uSaturation - 1.0);
 
-    // 4. COLOR SHIFT & OVERLAY
+    // COLOR SHIFT & OVERLAY
     result.r += uRedShift;
     result.g += uGreenShift;
     result.b += uBlueShift;
@@ -110,14 +110,14 @@ void main() {
         result = mix(result, uOverlayColor, uOverlayStrength);
     }
 
-    // 5. GAMMA CORRECTION
+    // GAMMA CORRECTION
     result = pow(max(result, 0.0), vec3(uGamma));
 
-    // 6. BEAUTY CURVE (Mềm mại S-Curve)
+    // BEAUTY CURVE (Mềm mại S-Curve)
     vec3 sCurve = result * result * (3.0 - 2.0 * result);
     result = mix(result, sCurve, 0.4); 
 
-    // 7. VIGNETTE (Tập trung trung tâm)
+    // VIGNETTE (Tập trung trung tâm)
     float dist = distance(vTexCoord, vec2(0.5, 0.5));
     float vignette = smoothstep(0.8, 0.4, dist);
     result = mix(result, result * vignette, 0.25);

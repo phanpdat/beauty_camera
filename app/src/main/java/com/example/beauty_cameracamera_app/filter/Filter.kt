@@ -6,9 +6,9 @@ data class Filter(
     val params: FilterParams
 )
 
-/**
- * BỘ THAM SỐ ĐIỀU KHIỂN MÀU SẮC (THE BRAIN OF SHADER)
- */
+
+ // BỘ THAM SỐ ĐIỀU KHIỂN MÀU SẮC (THE BRAIN OF SHADER)
+
 data class FilterParams(
     // 1. Độ sáng (Phạm vi: -1.0 đến 1.0, Mặc định: 0.0)
     val brightness: Float = 0f,

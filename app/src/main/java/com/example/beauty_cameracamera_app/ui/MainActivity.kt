@@ -75,7 +75,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupIntensitySeekBar() {
-        // Kiểm tra xem thiết bị có hỗ trợ AI MediaPipe không (Máy ảo x86/x86_64 thường không hỗ trợ) 🛰️🛡️
         val isAiSupported = Build.SUPPORTED_ABIS.any { it.contains("arm") }
         
         if (!isAiSupported) {
@@ -87,7 +86,6 @@ class MainActivity : AppCompatActivity() {
             binding.eyeSizeSeekBar.alpha = 0.5f
             binding.lipSizeSeekBar.isEnabled = false
             binding.lipSizeSeekBar.alpha = 0.5f
-            Toast.makeText(this, "🛡️ Chế độ AI chỉ hoạt động trên điện thoại thật (ARM).", Toast.LENGTH_LONG).show()
         }
 
         // Filter Intensity
@@ -102,13 +100,11 @@ class MainActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        // AI Nose Slimming 👃✨
-        binding.noseSlimmingSeekBar.progress = 50 // Mặc định ở giữa (Không thay đổi)
+        // AI Nose Slimming 
+        binding.noseSlimmingSeekBar.progress = 50
         binding.noseSlimmingSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser && isAiSupported) {
-                    // Ánh xạ từ (0-100) sang (-1.0 đến 1.0) 📐✨
-                    // 50 -> 0.0 (Bình thường), 0 -> -1.0 (Nhỏ lại), 100 -> 1.0 (To ra)
                     val amount = (progress - 50f) / 50f
                     renderer?.noseSlimming = amount
                 }
@@ -117,7 +113,7 @@ class MainActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        // AI V-Line Chin 🦴✨
+        // AI V-Line Chin 
         binding.chinSlimmingSeekBar.progress = 50 
         binding.chinSlimmingSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -130,7 +126,7 @@ class MainActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        // AI Big Eyes 👀✨
+        // AI Big Eyes 
         binding.eyeSizeSeekBar.progress = 0 
         binding.eyeSizeSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -143,7 +139,7 @@ class MainActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        // AI Fuller Lips 👄✨
+        // AI Fuller Lips 
         binding.lipSizeSeekBar.progress = 50 
         binding.lipSizeSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -197,7 +193,7 @@ class MainActivity : AppCompatActivity() {
         binding.cameraGLView.init(renderer!!)
     }
 
-    // ========== Capture ==========
+    //Capture
 
     private fun setupCaptureButton() {
         binding.btnCapture.setOnClickListener {
@@ -237,7 +233,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             bitmap.recycle()
-            Toast.makeText(this, "📸 Đã lưu ảnh!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Đã lưu ảnh!", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             Toast.makeText(this, "Lỗi lưu ảnh: ${e.message}", Toast.LENGTH_SHORT).show()
         }

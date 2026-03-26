@@ -13,9 +13,6 @@ import com.google.mediapipe.tasks.vision.core.RunningMode
 import com.google.mediapipe.tasks.vision.facelandmarker.FaceLandmarker
 import com.google.mediapipe.tasks.vision.facelandmarker.FaceLandmarkerResult
 
-
-//Chịu trách nhiệm nhận diện 468 điểm mốc trên khuôn mặt bằng MediaPipe.
-
 class FaceMeshHelper(
     private val context: Context,
     private val listener: FaceMeshListener
@@ -34,13 +31,13 @@ class FaceMeshHelper(
 
     private fun setupFaceLandmarker() {
         val baseOptionsBuilder = BaseOptions.builder()
-            .setDelegate(Delegate.CPU) // Chạy trên CPU để ổn định nhất trên mọi thiết bị (kể cả máy ảo)
-            .setModelAssetPath(MODEL_PATH) // File model trong thư mục assets
+            .setDelegate(Delegate.CPU) 
+            .setModelAssetPath(MODEL_PATH) 
 
         try {
             val optionsBuilder = FaceLandmarker.FaceLandmarkerOptions.builder()
                 .setBaseOptions(baseOptionsBuilder.build())
-                .setRunningMode(RunningMode.LIVE_STREAM) // Chuyển sang LIVE_STREAM để dùng Listener 
+                .setRunningMode(RunningMode.LIVE_STREAM) 
                 .setNumFaces(1)
                 .setMinFaceDetectionConfidence(0.5f)
                 .setMinFacePresenceConfidence(0.5f)

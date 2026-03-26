@@ -61,14 +61,13 @@ class CameraRenderer(
     @Volatile
     var scale: Float = 1.0f 
 
-    // THÔNG SỐ PHẪU THUẬT MŨI (AI) 👃✨
+    // THÔNG SỐ PHẪU THUẬT MŨI (AI) 
     @Volatile
     var noseCenter: Pair<Float, Float> = Pair(0.5f, 0.5f) 
     
     @Volatile
-    var noseSlimming: Float = 0.0f // 0.0 là bình thường, 1.0 là thon gọn nhất
-
-    // THÔNG SỐ CẰM, MẮT, MÔI (AI) 🦴👀👄
+    var noseSlimming: Float = 0.0f 
+    // THÔNG SỐ CẰM, MẮT, MÔI (AI) 
     @Volatile
     var chinCenter: Pair<Float, Float> = Pair(0.5f, 0.5f)
     @Volatile
@@ -114,7 +113,7 @@ class CameraRenderer(
 
         oesTextureId = createOESTexture()
         val st = SurfaceTexture(oesTextureId)
-        st.setDefaultBufferSize(1080, 1920) // Đảm bảo độ phân giải cao nhất cho Surface
+        st.setDefaultBufferSize(1080, 1920) 
         surfaceTexture = st
         onSurfaceReady(st)
     }
@@ -146,7 +145,7 @@ class CameraRenderer(
         GLES20.glUniform1f(uIntensityLoc, intensity)
         GLES20.glUniform1f(uScaleLoc, scale)
         
-        // NẠP TỌA ĐỘ TỪ AI VÀO GPU 🧠✨
+        // NẠP TỌA ĐỘ TỪ AI VÀO GPU
         GLES20.glUniform2f(uNoseCenterLoc, noseCenter.first, noseCenter.second)
         GLES20.glUniform1f(uNoseSlimmingLoc, noseSlimming)
         
@@ -160,7 +159,7 @@ class CameraRenderer(
         GLES20.glUniform2f(uLipCenterLoc, lipCenter.first, lipCenter.second)
         GLES20.glUniform1f(uLipSizeLoc, lipSize)
 
-        // CHỖ NÀY ĐÃ ĐƯỢC SỬA LẠI CHUẨN (GLES20.glUniform3f) ✨
+        // CHỖ NÀY ĐÃ ĐƯỢC SỬA LẠI CHUẨN (GLES20.glUniform3f) 
         GLES20.glUniform3f(uOverlayColorLoc, p.overlayR, p.overlayG, p.overlayB)
         GLES20.glUniform1f(uOverlayStrengthLoc, p.overlayStrength)
 

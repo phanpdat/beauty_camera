@@ -34,7 +34,6 @@ class CameraManager @Inject constructor(
     ) {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
 
-        // Khởi tạo AI an toàn — nếu thất bại (vd: máy ảo x86_64) thì bỏ qua, camera vẫn chạy 🛡️
         var faceMeshHelper: FaceMeshHelper? = null
         try {
             faceMeshHelper = FaceMeshHelper(context, faceMeshListener)
@@ -81,7 +80,6 @@ class CameraManager @Inject constructor(
                         lifecycleOwner, cameraSelector, preview, imageAnalysis
                     )
                 } else {
-                    // Chế độ Camera-only (trên máy ảo x86_64)
                     cameraProvider?.bindToLifecycle(
                         lifecycleOwner, cameraSelector, preview
                     )
