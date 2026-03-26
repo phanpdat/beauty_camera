@@ -3,6 +3,7 @@ package com.example.beauty_cameracamera_app.ui
 import android.graphics.SurfaceTexture
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
+import com.example.beauty_cameracamera_app.ai.FaceMeshHelper
 import com.example.beauty_cameracamera_app.camera.CameraManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,13 +22,17 @@ class CameraViewModel @Inject constructor(
         _filterIntensity.value = value
     }
 
-    fun startCamera(lifecycleOwner: LifecycleOwner, surfaceTexture: SurfaceTexture) {
-        cameraManager.startCamera(lifecycleOwner, surfaceTexture)
+    fun startCamera(
+        lifecycleOwner: LifecycleOwner, 
+        surfaceTexture: SurfaceTexture,
+        faceMeshListener: FaceMeshHelper.FaceMeshListener
+    ) {
+        cameraManager.startCamera(lifecycleOwner, surfaceTexture, faceMeshListener)
     }
 
-    fun switchCamera(lifecycleOwner: LifecycleOwner, surfaceTexture: SurfaceTexture) {
-        cameraManager.switchCamera(lifecycleOwner, surfaceTexture)
-    }
+//    fun switchCamera(lifecycleOwner: LifecycleOwner, surfaceTexture: SurfaceTexture) {
+//        cameraManager.switchCamera(lifecycleOwner, surfaceTexture)
+//    }
 
     override fun onCleared() {
         super.onCleared()

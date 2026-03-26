@@ -11,6 +11,12 @@ uniform float uSaturation;
 uniform float uRedShift;
 uniform float uGreenShift;
 uniform float uBlueShift;
+// ZOOM CONTROL
+uniform float uScale; // > 1.0 là Zoom-out (Nhỏ lại), < 1.0 là Zoom-in (To lên)
+
+// AI RESHAPE (Nose Slimming) 
+uniform vec2 uNoseCenter;
+uniform float uNoseSlimming;
 uniform float uGamma;
 uniform float uIntensity;
 
@@ -18,6 +24,7 @@ uniform float uIntensity;
 uniform vec3 uOverlayColor;
 uniform float uOverlayStrength;
 
+// tăng màu cho những vùng nhạt
 vec3 applyVibrance(vec3 color, float vibrance) {
     float average = (color.r + color.g + color.b) / 3.0;
     float mx = max(color.r, max(color.g, color.b));
@@ -25,16 +32,36 @@ vec3 applyVibrance(vec3 color, float vibrance) {
     return mix(color, vec3(mx), amt);
 }
 
+// Hàm nắn bóp khuôn mặt đa năng (To/Nhỏ đều được) 
+vec2 liquifyWarp(vec2 uv, vec2 center, float radius, float amount) {
+    float d = distance(uv, center);
+    if (d < radius) {
+        float percent = d / radius;
+        // Logic: amount > 0 -> To ra, amount < 0 -> Nhỏ lại 
+        float factor = 1.0 - pow(1.0 - percent, 2.0) * amount * 0.4; 
+        return center + (uv - center) * factor;
+    }
+    return uv;
+}
+
 void main() {
+    // 0. ZOOM CONTROL (Lùi xa mặt ra)
+    vec2 uv = (vTexCoord - 0.5) * uScale + 0.5;
+
+    // 0.1 NÂNG MŨI THON GỌN (AI RESHAPE) 
+    if (abs(uNoseSlimming) > 0.001) {
+        uv = liquifyWarp(uv, uNoseCenter, 0.15, uNoseSlimming);
+    }
+
     // 1. SIÊU LÀM NÉT (Ultra-Sharpen Algorithm) - Cải thiện độ trong trẻo 100%
     float offset = 1.0 / 1024.0; // Sử dụng lưới lấy mẫu siêu mịn
-    vec3 baseColor = texture2D(uTexture, vTexCoord).rgb;
+    vec3 baseColor = texture2D(uTexture, uv).rgb;
     
     // Kỹ thuật Laplacian Sharpening: Lấy mẫu 5 điểm quanh tâm
-    vec3 right  = texture2D(uTexture, vTexCoord + vec2(offset, 0.0)).rgb;
-    vec3 left   = texture2D(uTexture, vTexCoord + vec2(-offset, 0.0)).rgb;
-    vec3 top    = texture2D(uTexture, vTexCoord + vec2(0.0, -offset)).rgb;
-    vec3 bottom = texture2D(uTexture, vTexCoord + vec2(0.0, offset)).rgb;
+    vec3 right  = texture2D(uTexture, uv + vec2(offset, 0.0)).rgb;
+    vec3 left   = texture2D(uTexture, uv + vec2(-offset, 0.0)).rgb;
+    vec3 top    = texture2D(uTexture, uv + vec2(0.0, -offset)).rgb;
+    vec3 bottom = texture2D(uTexture, uv + vec2(0.0, offset)).rgb;
     
     // Thuật toán: Làm nổi bật sự khác biệt của trung tâm so với vùng lân cận
     vec3 sharpColor = baseColor * 5.0 - (left + right + top + bottom);

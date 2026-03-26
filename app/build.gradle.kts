@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.beauty_cameracamera_app"
-        minSdk = 24
+        minSdk = 25
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -28,6 +28,17 @@ android {
             )
         }
     }
+
+    packaging {
+        jniLibs {
+            // Ép Android không nén file .so để máy ảo dễ tìm thấy 💾🚀
+            useLegacyPackaging = true
+            // Đảm bảo lấy đúng file cho mọi loại chip 🛰️⚡️
+            pickFirsts += "**/libmediapipe_tasks_vision_jni.so"
+            pickFirsts += "**/libc++_shared.so"
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -62,6 +73,9 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.kotlinx.coroutines.android)
+
+    // MediaPipe
+    implementation(libs.mediapipe.tasks.vision)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

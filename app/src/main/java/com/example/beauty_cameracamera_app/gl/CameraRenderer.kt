@@ -30,6 +30,8 @@ class CameraRenderer(
     private var uSTMatrixLoc = -1
     private var uIntensityLoc = -1
     private var uScaleLoc = -1 
+    private var uNoseCenterLoc = -1
+    private var uNoseSlimmingLoc = -1
 
     // Handles Filter Params
     private var uBrightnessLoc = -1
@@ -50,7 +52,14 @@ class CameraRenderer(
     var intensity: Float = 0.8f
 
     @Volatile
-    var scale: Float = 1.1f 
+    var scale: Float = 1.0f 
+
+    // THÔNG SỐ PHẪU THUẬT MŨI (AI) 👃✨
+    @Volatile
+    var noseCenter: Pair<Float, Float> = Pair(0.5f, 0.5f) 
+    
+    @Volatile
+    var noseSlimming: Float = 0.0f // 0.0 là bình thường, 1.0 là thon gọn nhất
 
     @Volatile
     private var currentFilter: Filter = FilterList.getFilters()[0]
@@ -111,6 +120,10 @@ class CameraRenderer(
         GLES20.glUniform1f(uGammaLoc, p.gamma)
         GLES20.glUniform1f(uIntensityLoc, intensity)
         GLES20.glUniform1f(uScaleLoc, scale)
+        
+        // NẠP TỌA ĐỘ MŨI TỪ AI 👃✨
+        GLES20.glUniform2f(uNoseCenterLoc, noseCenter.first, noseCenter.second)
+        GLES20.glUniform1f(uNoseSlimmingLoc, noseSlimming)
 
         // CHỖ NÀY ĐÃ ĐƯỢC SỬA LẠI CHUẨN (GLES20.glUniform3f) ✨
         GLES20.glUniform3f(uOverlayColorLoc, p.overlayR, p.overlayG, p.overlayB)
@@ -141,6 +154,8 @@ class CameraRenderer(
         uSTMatrixLoc = GLES20.glGetUniformLocation(shaderProgram, "uSTMatrix")
         uIntensityLoc = GLES20.glGetUniformLocation(shaderProgram, "uIntensity")
         uScaleLoc     = GLES20.glGetUniformLocation(shaderProgram, "uScale")
+        uNoseCenterLoc = GLES20.glGetUniformLocation(shaderProgram, "uNoseCenter")
+        uNoseSlimmingLoc = GLES20.glGetUniformLocation(shaderProgram, "uNoseSlimming")
 
         uBrightnessLoc = GLES20.glGetUniformLocation(shaderProgram, "uBrightness")
         uContrastLoc = GLES20.glGetUniformLocation(shaderProgram, "uContrast")

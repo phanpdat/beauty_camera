@@ -23,7 +23,9 @@ import com.example.beauty_cameracamera_app.databinding.ActivityMainBinding
 import com.example.beauty_cameracamera_app.filter.Filter
 import com.example.beauty_cameracamera_app.filter.FilterList
 import androidx.lifecycle.lifecycleScope
+import com.example.beauty_cameracamera_app.ai.FaceMeshHelper
 import com.example.beauty_cameracamera_app.gl.CameraRenderer
+import com.google.mediapipe.tasks.components.containers.NormalizedLandmark
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.io.File
@@ -73,14 +75,36 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupIntensitySeekBar() {
-        // Initial setup
-        binding.intensitySeekBar.progress = (viewModel.filterIntensity.value * 100).toInt()
+        // Kiểm tra xem thiết bị có hỗ trợ AI MediaPipe không (Máy ảo x86/x86_64 thường không hỗ trợ) 🛰️🛡️
+        val isAiSupported = Build.SUPPORTED_ABIS.any { it.contains("arm") }
+        
+        if (!isAiSupported) {
+            binding.noseSlimmingSeekBar.isEnabled = false
+            binding.noseSlimmingSeekBar.alpha = 0.5f
+            Toast.makeText(this, "🛡️ Chế độ AI (Nâng mũi) chỉ hoạt động trên điện thoại thật (ARM).", Toast.LENGTH_LONG).show()
+        }
 
         // Filter Intensity
+        binding.intensitySeekBar.progress = (viewModel.filterIntensity.value * 100).toInt()
         binding.intensitySeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
                     viewModel.updateFilterIntensity(progress / 100f)
+                }
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+
+        // AI Nose Slimming 👃✨
+        binding.noseSlimmingSeekBar.progress = 50 // Mặc định ở giữa (Không thay đổi)
+        binding.noseSlimmingSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser && isAiSupported) {
+                    // Ánh xạ từ (0-100) sang (-1.0 đến 1.0) 📐✨
+                    // 50 -> 0.0 (Bình thường), 0 -> -1.0 (Nhỏ lại), 100 -> 1.0 (To ra)
+                    val amount = (progress - 50f) / 50f
+                    renderer?.noseSlimming = amount
                 }
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -99,7 +123,18 @@ class MainActivity : AppCompatActivity() {
     private fun initGLView() {
         renderer = CameraRenderer(this) { st ->
             runOnUiThread {
-                viewModel.startCamera(this, st)
+                viewModel.startCamera(this, st, object : FaceMeshHelper.FaceMeshListener {
+                    override fun onResults(landmarks: List<NormalizedLandmark>) {
+                        // Lấy tọa độ điểm Đỉnh mũi (Index 1)
+                        val noseTip = landmarks[1]
+                        renderer?.noseCenter = Pair(noseTip.x(), noseTip.y())
+
+                    }
+
+                    override fun onEmpty() {
+                        renderer?.noseCenter = Pair(0.5f, 0.5f)
+                    }
+                })
             }
         }
         binding.cameraGLView.init(renderer!!)
