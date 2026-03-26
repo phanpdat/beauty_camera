@@ -17,7 +17,7 @@ uniform float uScale; // > 1.0 là Zoom-out (Nhỏ lại), < 1.0 là Zoom-in (To
 uniform vec2 uNoseCenter;
 uniform float uNoseSlimming;
 
-// AI RESHAPE (Chin, Eyes, Lips) 🦴👀👄
+// AI RESHAPE (Chin, Eyes, Lips)
 uniform vec2 uChinCenter;
 uniform float uChinSlimming;
 
