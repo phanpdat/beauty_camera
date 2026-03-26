@@ -81,7 +81,13 @@ class MainActivity : AppCompatActivity() {
         if (!isAiSupported) {
             binding.noseSlimmingSeekBar.isEnabled = false
             binding.noseSlimmingSeekBar.alpha = 0.5f
-            Toast.makeText(this, "🛡️ Chế độ AI (Nâng mũi) chỉ hoạt động trên điện thoại thật (ARM).", Toast.LENGTH_LONG).show()
+            binding.chinSlimmingSeekBar.isEnabled = false
+            binding.chinSlimmingSeekBar.alpha = 0.5f
+            binding.eyeSizeSeekBar.isEnabled = false
+            binding.eyeSizeSeekBar.alpha = 0.5f
+            binding.lipSizeSeekBar.isEnabled = false
+            binding.lipSizeSeekBar.alpha = 0.5f
+            Toast.makeText(this, "🛡️ Chế độ AI chỉ hoạt động trên điện thoại thật (ARM).", Toast.LENGTH_LONG).show()
         }
 
         // Filter Intensity
@@ -110,6 +116,45 @@ class MainActivity : AppCompatActivity() {
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
+
+        // AI V-Line Chin 🦴✨
+        binding.chinSlimmingSeekBar.progress = 50 
+        binding.chinSlimmingSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser && isAiSupported) {
+                    val amount = (progress - 50f) / 50f
+                    renderer?.chinSlimming = amount
+                }
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+
+        // AI Big Eyes 👀✨
+        binding.eyeSizeSeekBar.progress = 0 
+        binding.eyeSizeSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser && isAiSupported) {
+                    val amount = progress / 100f
+                    renderer?.eyeSize = amount
+                }
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+
+        // AI Fuller Lips 👄✨
+        binding.lipSizeSeekBar.progress = 50 
+        binding.lipSizeSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser && isAiSupported) {
+                    val amount = (progress - 50f) / 50f
+                    renderer?.lipSize = amount
+                }
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
     }
 
     private fun checkPermissions() {
@@ -125,14 +170,26 @@ class MainActivity : AppCompatActivity() {
             runOnUiThread {
                 viewModel.startCamera(this, st, object : FaceMeshHelper.FaceMeshListener {
                     override fun onResults(landmarks: List<NormalizedLandmark>) {
-                        // Lấy tọa độ điểm Đỉnh mũi (Index 1)
+                        // Lấy tọa độ các mốc
                         val noseTip = landmarks[1]
-                        renderer?.noseCenter = Pair(noseTip.x(), noseTip.y())
+                        val chinTip = landmarks[152]
+                        val leftEye = landmarks[159]
+                        val rightEye = landmarks[386]
+                        val upperLip = landmarks[13]
 
+                        renderer?.noseCenter = Pair(noseTip.x(), noseTip.y())
+                        renderer?.chinCenter = Pair(chinTip.x(), chinTip.y())
+                        renderer?.leftEyeCenter = Pair(leftEye.x(), leftEye.y())
+                        renderer?.rightEyeCenter = Pair(rightEye.x(), rightEye.y())
+                        renderer?.lipCenter = Pair(upperLip.x(), upperLip.y())
                     }
 
                     override fun onEmpty() {
                         renderer?.noseCenter = Pair(0.5f, 0.5f)
+                        renderer?.chinCenter = Pair(0.5f, 0.5f)
+                        renderer?.leftEyeCenter = Pair(0.5f, 0.5f)
+                        renderer?.rightEyeCenter = Pair(0.5f, 0.5f)
+                        renderer?.lipCenter = Pair(0.5f, 0.5f)
                     }
                 })
             }

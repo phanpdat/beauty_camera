@@ -32,6 +32,13 @@ class CameraRenderer(
     private var uScaleLoc = -1 
     private var uNoseCenterLoc = -1
     private var uNoseSlimmingLoc = -1
+    private var uChinCenterLoc = -1
+    private var uChinSlimmingLoc = -1
+    private var uLeftEyeCenterLoc = -1
+    private var uRightEyeCenterLoc = -1
+    private var uEyeSizeLoc = -1
+    private var uLipCenterLoc = -1
+    private var uLipSizeLoc = -1
 
     // Handles Filter Params
     private var uBrightnessLoc = -1
@@ -60,6 +67,24 @@ class CameraRenderer(
     
     @Volatile
     var noseSlimming: Float = 0.0f // 0.0 là bình thường, 1.0 là thon gọn nhất
+
+    // THÔNG SỐ CẰM, MẮT, MÔI (AI) 🦴👀👄
+    @Volatile
+    var chinCenter: Pair<Float, Float> = Pair(0.5f, 0.5f)
+    @Volatile
+    var chinSlimming: Float = 0.0f
+
+    @Volatile
+    var leftEyeCenter: Pair<Float, Float> = Pair(0.5f, 0.5f)
+    @Volatile
+    var rightEyeCenter: Pair<Float, Float> = Pair(0.5f, 0.5f)
+    @Volatile
+    var eyeSize: Float = 0.0f
+
+    @Volatile
+    var lipCenter: Pair<Float, Float> = Pair(0.5f, 0.5f)
+    @Volatile
+    var lipSize: Float = 0.0f
 
     @Volatile
     private var currentFilter: Filter = FilterList.getFilters()[0]
@@ -121,9 +146,19 @@ class CameraRenderer(
         GLES20.glUniform1f(uIntensityLoc, intensity)
         GLES20.glUniform1f(uScaleLoc, scale)
         
-        // NẠP TỌA ĐỘ MŨI TỪ AI 👃✨
+        // NẠP TỌA ĐỘ TỪ AI VÀO GPU 🧠✨
         GLES20.glUniform2f(uNoseCenterLoc, noseCenter.first, noseCenter.second)
         GLES20.glUniform1f(uNoseSlimmingLoc, noseSlimming)
+        
+        GLES20.glUniform2f(uChinCenterLoc, chinCenter.first, chinCenter.second)
+        GLES20.glUniform1f(uChinSlimmingLoc, chinSlimming)
+        
+        GLES20.glUniform2f(uLeftEyeCenterLoc, leftEyeCenter.first, leftEyeCenter.second)
+        GLES20.glUniform2f(uRightEyeCenterLoc, rightEyeCenter.first, rightEyeCenter.second)
+        GLES20.glUniform1f(uEyeSizeLoc, eyeSize)
+        
+        GLES20.glUniform2f(uLipCenterLoc, lipCenter.first, lipCenter.second)
+        GLES20.glUniform1f(uLipSizeLoc, lipSize)
 
         // CHỖ NÀY ĐÃ ĐƯỢC SỬA LẠI CHUẨN (GLES20.glUniform3f) ✨
         GLES20.glUniform3f(uOverlayColorLoc, p.overlayR, p.overlayG, p.overlayB)
@@ -154,8 +189,19 @@ class CameraRenderer(
         uSTMatrixLoc = GLES20.glGetUniformLocation(shaderProgram, "uSTMatrix")
         uIntensityLoc = GLES20.glGetUniformLocation(shaderProgram, "uIntensity")
         uScaleLoc     = GLES20.glGetUniformLocation(shaderProgram, "uScale")
+        
         uNoseCenterLoc = GLES20.glGetUniformLocation(shaderProgram, "uNoseCenter")
         uNoseSlimmingLoc = GLES20.glGetUniformLocation(shaderProgram, "uNoseSlimming")
+        
+        uChinCenterLoc = GLES20.glGetUniformLocation(shaderProgram, "uChinCenter")
+        uChinSlimmingLoc = GLES20.glGetUniformLocation(shaderProgram, "uChinSlimming")
+        
+        uLeftEyeCenterLoc = GLES20.glGetUniformLocation(shaderProgram, "uLeftEye")
+        uRightEyeCenterLoc = GLES20.glGetUniformLocation(shaderProgram, "uRightEye")
+        uEyeSizeLoc = GLES20.glGetUniformLocation(shaderProgram, "uEyeSize")
+        
+        uLipCenterLoc = GLES20.glGetUniformLocation(shaderProgram, "uLipCenter")
+        uLipSizeLoc = GLES20.glGetUniformLocation(shaderProgram, "uLipSize")
 
         uBrightnessLoc = GLES20.glGetUniformLocation(shaderProgram, "uBrightness")
         uContrastLoc = GLES20.glGetUniformLocation(shaderProgram, "uContrast")

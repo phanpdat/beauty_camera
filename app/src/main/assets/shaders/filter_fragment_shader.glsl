@@ -14,9 +14,20 @@ uniform float uBlueShift;
 // ZOOM CONTROL
 uniform float uScale; // > 1.0 là Zoom-out (Nhỏ lại), < 1.0 là Zoom-in (To lên)
 
-// AI RESHAPE (Nose Slimming) 
 uniform vec2 uNoseCenter;
 uniform float uNoseSlimming;
+
+// AI RESHAPE (Chin, Eyes, Lips) 🦴👀👄
+uniform vec2 uChinCenter;
+uniform float uChinSlimming;
+
+uniform vec2 uLeftEye;
+uniform vec2 uRightEye;
+uniform float uEyeSize;
+
+uniform vec2 uLipCenter;
+uniform float uLipSize;
+
 uniform float uGamma;
 uniform float uIntensity;
 
@@ -51,6 +62,22 @@ void main() {
     // 0.1 NÂNG MŨI THON GỌN (AI RESHAPE) 
     if (abs(uNoseSlimming) > 0.001) {
         uv = liquifyWarp(uv, uNoseCenter, 0.15, uNoseSlimming);
+    }
+
+    // 0.2 GỌT CẰM V-LINE 🦴✨
+    if (abs(uChinSlimming) > 0.001) {
+        uv = liquifyWarp(uv, uChinCenter, 0.20, uChinSlimming);
+    }
+
+    // 0.3 MẮT TO TRÒN 👀✨ (Sử dụng số âm vì amount < 0 là phình to)
+    if (abs(uEyeSize) > 0.001) {
+        uv = liquifyWarp(uv, uLeftEye, 0.10, -uEyeSize);
+        uv = liquifyWarp(uv, uRightEye, 0.10, -uEyeSize);
+    }
+
+    // 0.4 MÔI MỌNG 👄✨
+    if (abs(uLipSize) > 0.001) {
+        uv = liquifyWarp(uv, uLipCenter, 0.12, uLipSize);
     }
 
     // 1. SIÊU LÀM NÉT (Ultra-Sharpen Algorithm) - Cải thiện độ trong trẻo 100%
